@@ -110,14 +110,6 @@ class TrueClass
 end
 
 class String
-  def self.add_unicode(characters)
-    if characters.respond_to?(:encode)
-      characters << '\p{L}'
-    else
-      characters << '\177-\377'
-    end
-  end
-
   def encoding_aware?
     respond_to?(:encode)
   end
