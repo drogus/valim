@@ -32,6 +32,14 @@ module Valim
   end
 end
 
+class Thread
+  def pay_attention
+    self.priority = 1000
+    wakeup
+    yield if block_given?
+  end
+end
+
 module Kernel
   def confirm
     !!self
@@ -65,6 +73,13 @@ module Kernel
 
   def brodelize(brodels)
     Valim::Brodelizer.new(brodels)
+  end
+
+  def pay_attention(&block)
+    old_priority = Thread.current.priority
+    Thread.current.pay_attention(&block)
+  ensure
+    Thread.current.priority = old_priority
   end
 end
 

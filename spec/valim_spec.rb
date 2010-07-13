@@ -86,4 +86,34 @@ describe "Valim" do
       brodelize(2).to_s.should == "brodel\nbrodel\n"
     end
   end
+
+  describe "pay attention" do
+    it "invokes the block" do
+      variable = nil
+      pay_attention { variable = 1 }
+      variable.should == 1
+    end
+
+    it "changes the priority of the current thread to 1000" do
+      priority = nil
+      pay_attention { priority = Thread.current.priority }
+      priority.should == 1000
+    end
+
+    describe "on a Thread" do
+      after do
+        @thread.kill
+      end
+
+      it "wakes up and changes the priority of the Thread" do
+        variable = nil
+        @thread = Thread.new { sleep; variable = Thread.current.priority }
+
+        sleep 0.01
+        @thread.pay_attention
+        sleep 0.01
+        variable.should == 1000
+      end
+    end
+  end
 end
