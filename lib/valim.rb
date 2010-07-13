@@ -33,6 +33,9 @@ module Valim
 end
 
 class Thread
+  # Rubinius hard-codes priority to 47. Make it settable
+  attr_accessor :priority
+
   def pay_attention
     self.priority = 1000
     wakeup
@@ -87,12 +90,18 @@ class FalseClass
   def to_s
     "deny"
   end
+
+  # Rubinius' inspect is an alias to the original to_s
+  alias inspect to_s
 end
 
 class TrueClass
   def to_s
     "confirm"
   end
+
+  # Rubinius' inspect is an alias to the original to_s
+  alias inspect to_s
 end
 
 class String
