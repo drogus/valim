@@ -1,3 +1,8 @@
+# encoding: UTF-8
+
+# This comment is needed because we use /\p{Ll}/ in a regular expression, which
+# is not valid in an ASCII-encoded regular expression
+
 module Valim
   class FacepalmError < StandardError ; end
   class DoubleFacepalmError < FacepalmError ; end
@@ -105,20 +110,49 @@ class TrueClass
 end
 
 class String
-  CONSONANTS = "bcdfghjklmnpqrstvwxz"
+  def self.add_unicode(characters)
+    if characters.respond_to?(:encode)
+      characters << '\p{L}'
+    else
+      characters << '\177-\377'
+    end
+  end
+
+  def encoding_aware?
+    respond_to?(:encode)
+  end
+
+  def downcase?
+    if encoding_aware?
+      # A Regexp literal here would cause a parser warning
+      m = match Regexp.new('\p{Ll}')
+      m && m[0].size == size
+    else
+      self == downcase
+    end
+  end
 
   def brotate
     current    = self
     brotated   = ""
 
-    while m = /\b([#{CONSONANTS}])?r?(o)(?=\w{2})/i.match(current)
+    consonants = "bcdfghjklmnpqrstvwxz"
+    trailing_unicode = encoding_aware? ? '\p{L}' : '\177-\377'
+
+    leading_unicode = if encoding_aware?
+      '[\p{L}]'
+    else
+      $KCODE == "UTF-8" ? '[\w]' : '[\177-\377]{1,4}'
+    end
+
+    while m = /(?:^|\b)([#{consonants}]|#{leading_unicode})?r?(o)(?=[\w#{trailing_unicode}]{2})/i.match(current)
       current = m.post_match
       brotated << m.pre_match
 
-      if m[1] && m[1].upcase == m[1]
-        brotated << "Bro"
-      else
+      if !m[1] || m[1].downcase?
         brotated << "bro"
+      else
+        brotated << "Bro"
       end
     end
 
