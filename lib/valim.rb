@@ -26,6 +26,16 @@ module Valim
     end
   end
 
+  class Dude
+    def initialize(*args)
+      @sentence = args.map {|e| e.to_s}.join(" ")
+    end
+
+    def to_s
+      "Dude! #{@sentence.capitalize}"
+    end
+  end
+
   class Brodelizer
     def initialize(amount)
       @amount = amount
@@ -49,6 +59,10 @@ class Thread
 end
 
 module Kernel
+  def dude(*args)
+    Valim::Dude.new(*args)
+  end
+
   def confirm
     !!self
   end

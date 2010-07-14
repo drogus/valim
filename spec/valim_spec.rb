@@ -6,6 +6,11 @@ describe "Valim" do
     Valim.have_doubts { 5 < 2 }.should == deny
   end
 
+  it "calls you dude" do
+    comeon = common
+    (dude comeon).to_s.should == "Dude! Come on"
+  end
+
   it "facepalms" do
     lambda { facepalm }.should raise_error(Valim::FacepalmError)
   end
